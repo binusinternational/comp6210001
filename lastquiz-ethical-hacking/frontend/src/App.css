@@ -1,0 +1,7 @@
+.form-active {
+    display: block;
+}
+
+.form-inactive {
+    visibility: hidden
+}

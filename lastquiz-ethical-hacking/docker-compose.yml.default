@@ -1,0 +1,47 @@
+version: "3.9"
+services:
+  mongo:
+    image: mongo:5.0.3
+    container_name: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - ./db:/data/db
+  backend:
+    build: ./backend/
+    container_name: backend
+    ports:
+      - "8001:80"
+    command: ["/start-reload.sh"]
+    volumes:
+      - ./backend/v1/main.py:/app/app/main.py
+      # - ./backend/v1:/app/app
+    environment:
+      - ACCESS_TOKEN_EXPIRE_MINUTES=2
+      - SECRET_KEY=6318e0710c104c22905cffb6b199568e9115d95bac81844a00147d5127bafc36
+      - CORS_ORIGIN='*'
+  frontend:
+    build: ./frontend/
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+  nginx:
+    build: ./nginx/
+    container_name: nginx
+    ports:
+      - "PORT_TO_BE_REPLACED:80"
+    environment:
+      - NGINX_PORT=80
+      - SERVER_ADDRESS=SERVER_ADDRESS_TO_BE_REPLACED
+      - SERVER_PORT=PORT_TO_BE_REPLACED
+    depends_on:
+      - mongo
+      - backend
+      - frontend
+
+
